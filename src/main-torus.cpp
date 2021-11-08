@@ -83,7 +83,7 @@ Point Points[4][3][3] = {
 		{
 			{-(R + r),0,0,1},
 			{0,0,-r,0},
-			{0,0,R - r,0}
+			{0,R-r,0,0}
 		},
 		{
 			{0,0,0,0},
@@ -159,22 +159,22 @@ Point Calculate(float u, float v, int idx) {
 	// WRITE CODE HERE TO EVALUATE THE VERTEX POSITION OF A POINT ON THE SURFACE ------------------------------
 
 		//u=Q, v=T
-	float constant = R * (1 + u * u) + r * (1 - u * u);
-	surfacePoint.w = (1 + v * v)*(1 + u * u);
-	surfacePoint.x = constant * (1 - v * v);
-	surfacePoint.y = constant * 2 * v;
-	surfacePoint.z = 2 * u*r*(1 + v * v);
 
-	if (idx % 2)
-	{
-		surfacePoint.z /= -1;
+		float constant = R * (1 + u * u) + r * (1 - u * u);
+		surfacePoint.w = (1 + v * v)*(1 + u * u);
+		surfacePoint.x = constant * (1 - v * v);
+		surfacePoint.y = constant * 2 * v;
+		surfacePoint.z = 2 * u*r*(1 + v * v);
+	
+		if (idx % 2)
+		{
+			surfacePoint.z /= -1;
 
-	}
-	if (idx >= 2)
-	{
-		surfacePoint.y /= -1;
-	}
-
+		}
+		if (idx >= 2)
+		{
+			surfacePoint.y /= -1;
+		}
 	// ---------------------------------------------------------------------------------------------------------
 
 	return surfacePoint;
@@ -244,20 +244,52 @@ Mesh* generateMesh() {
 
 	//Add faces
 	std::vector<Mesh::VertexHandle>  face_vhandles;
-	for (int k = posYposZ; k <= negYnegZ; ++k) {
+
 		for (int i = 0; i < LOD - 1; ++i) {
 			for (int j = 0; j < LOD - 1; ++j) {
-
+				for (int k = posYposZ; k <= negYnegZ; ++k) {
 
 				// STUDENT CODE SECTION 3
 				// NEED TO ADD FACES TO THE MESH USING YOUR VERTEX HANDLES DEFINED IN vhandle -------------
 
 				// ----------------------------------------------------------------------------------------
-				face_vhandles.push_back(vhandle[k][i][j]);
+				int i_end = i + 1;
+				int j_end = j + 1; 
+				Mesh::VertexHandle vij = vhandle[k][i][j];
+				Mesh::VertexHandle vi2j = vhandle[k][i_end][j];
+				Mesh::VertexHandle vij2 = vhandle[k][i][j_end];
+				Mesh::VertexHandle vi2j2 = vhandle[k][i_end][j_end];
+				if (k == 1 || k == 2) {
+					face_vhandles.clear();
+					face_vhandles.push_back(vij);
+					face_vhandles.push_back(vi2j);
+					face_vhandles.push_back(vij2);
+					mesh->add_face(face_vhandles);
+
+					face_vhandles.clear();
+					face_vhandles.push_back(vi2j);
+					face_vhandles.push_back(vi2j2);
+					face_vhandles.push_back(vij2);
+					mesh->add_face(face_vhandles);
+				}
+				else
+				{
+					face_vhandles.clear();
+					face_vhandles.push_back(vij2);
+					face_vhandles.push_back(vi2j);
+					face_vhandles.push_back(vij);
+					mesh->add_face(face_vhandles);
+
+					face_vhandles.clear();
+					face_vhandles.push_back(vij2);
+					face_vhandles.push_back(vi2j2);
+					face_vhandles.push_back(vi2j);
+					mesh->add_face(face_vhandles);
+				}
 			}
 		}
-		mesh->add_face(face_vhandles);
-		face_vhandles.clear();
+		//mesh->add_face(face_vhandles);
+		//face_vhandles.clear();
 	}
 
 	/*
