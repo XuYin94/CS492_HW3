@@ -55,78 +55,80 @@ enum torusQuadrant {
 Point Points[4][3][3] = {
 
 	//Positive y and positive z quarter of torus
-	{
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{
+				{R + r,0,0,1},
+				{R - r,0,0,1},
+				{-(R + r),0,0,1}
+			},
+			{
+				{-(R - r),0,0,1},
+				{0,0,r,0},
+				{0,R + r,0,0}
+			},
+			{
+				{0,0,0,0},
+				{0,R - r,0,0},
+				{0,0,r,0}
+			}
+		},
+
+	// Positive y and negative z quarter of torus
+		{
+		{
+			{R - r,0,0,1},
+			{R + r,0,0,1},
+			{-(R - r),0,0,1}
 		},
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{-(R + r),0,0,1},
+			{0,0,-r,0},
+			{0,0,R - r,0}
 		},
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{0,0,0,0},
+			{0,R + r,0,0},
+			{0,0,-r,0}
 		}
 	},
 
-	// Positive y and negative z quarter of torus
-	{
-		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
-		},
-		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
-		},
-		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
-		}
-	},
+
+
 
 	// Negative y and positive z quarter of torus
 	{
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{R + r,0,0,1},
+			{R - r,0,0,1},
+			{-(R + r),0,0,1}
 		},
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{-(R - r),0,0,1},
+			{0,0,r,0},
+			{0,0,-(R + r),0}
 		},
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{0,0,0,0},
+			{0,0,-(R - r),0},
+			{0,0,r,0}
 		}
 	},
-
 	// Negative y and negative z quarter of torus
 	{
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{-(R - r),0,0,1},
+			{R - r,0,0,1},
+			{-(R + r),0,0,1}
 		},
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{R + r,0,0,1},
+			{0,0,-r,0},
+			{0,0,0,0}
 		},
 		{
-			{0,0,0,1},
-			{0,0,0,1},
-			{0,0,0,1}
+			{0,-(R - r),0,0},
+			{0,-(R + r),0,0},
+			{0,0,-r,0}
 		}
 	}
 };
@@ -242,19 +244,22 @@ Mesh* generateMesh() {
 
 	//Add faces
 	std::vector<Mesh::VertexHandle>  face_vhandles;
-	for (int i = 0; i < LOD - 1; ++i) {
-		for (int j = 0; j < LOD - 1; ++j) {
-			for (int k = posYposZ; k <= negYnegZ; ++k) {
+	for (int k = posYposZ; k <= negYnegZ; ++k) {
+		for (int i = 0; i < LOD - 1; ++i) {
+			for (int j = 0; j < LOD - 1; ++j) {
+
 
 				// STUDENT CODE SECTION 3
 				// NEED TO ADD FACES TO THE MESH USING YOUR VERTEX HANDLES DEFINED IN vhandle -------------
 
 				// ----------------------------------------------------------------------------------------
-				face_vhandles.push_back(vhandle[i][j][k]);
+				face_vhandles.push_back(vhandle[k][i][j]);
 			}
 		}
+		mesh->add_face(face_vhandles);
+		face_vhandles.clear();
 	}
-	mesh->add_face(face_vhandles);
+
 	/*
 	 * Writes mesh as a .off file.
 	 * Can use the code in ComputeCurvature to view your mesh with lighting
